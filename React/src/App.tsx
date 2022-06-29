@@ -1,6 +1,6 @@
 import { FC, memo, MouseEvent, PropsWithChildren, SyntheticEvent, useCallback, useEffect, useState } from 'react'
 import './App.css'
-import { useCurring, useCurringFinal1, useCurringFinal2 } from '../useCurring'
+import { useCurring, useCurringFinal1, useCurringFinal2 } from './useCurring'
 
 const Button: FC<PropsWithChildren<{ onClick: any; }>> = memo(({ onClick, children }) => {
   return <button onClick={onClick}>{children}</button>
@@ -12,7 +12,7 @@ function App() {
   const [bool, setBool] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(setCount, 3000, count + 1);
+    const timer = setTimeout(setCount, 1000, count + 1);
 
     return () => clearTimeout(timer);
   }, [count]);
