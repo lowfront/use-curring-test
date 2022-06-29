@@ -1,6 +1,6 @@
 # useCurring 함수 메모이제이션 테스트
 
-기존 `useCurring` 함수에서 메모이제이션이 작동하지 않아서 기존 요구사항을 최대한 반영하면서 메모이제이션이 적용되는 `useCurring` 훅을 만들기 위한 예제 프로젝트. React 테스트는 [React Developer Tools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi?hl=ko)의 `Highlight updates when components render` 기능을 활용해서 리렌더링 컴포넌트를 확인하고, ReactNative 테스트는 앱 실행 후 상단 `useCurring` 탭에서 각각의 훅이 사용된 컴포넌트 리렌더링 여부 확인.
+기존 [useCurring](https://github.com/ridi/ridi/blob/master/frontends/app/books-mobile/src/hooks/contentsHome/useCurring.tsx) 함수에서 메모이제이션이 작동하지 않아서 기존 요구사항을 최대한 반영하면서 메모이제이션이 적용되는 `useCurring` 훅을 만들기 위한 예제 프로젝트. React 테스트는 [React Developer Tools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi?hl=ko)의 `Highlight updates when components render` 기능을 활용해서 리렌더링 컴포넌트를 확인하고, ReactNative 테스트는 앱 실행 후 상단 `useCurring` 탭에서 각각의 훅이 사용된 컴포넌트 리렌더링 여부 확인.
 
 ## 메모이제이션이 적용되지 않는 이유
 기존 `useCurring` 훅은 훅 호출 후 리턴값으로 핸들 함수를 반환하는 함수를 반환함. 이는 파라미터별로 `useCallback`을 이용해 핸들 함수를 따로 만들어야하는 불편함을 해소하고 고정된 파라미터값을 갖는 핸들 함수를 메모이제이션 하기 위한 목적으로 보임. 문제는 핸들함수에 해당하는 훅의 첫번째 매개변수 `fn`이 호출시 새로운 함수를 반환하는 형태라는 점임. 컴포넌트 리렌더링시 `callback`변수가 호출되면서 `fn(...(ref.current as T))`가 호출되어 파라미터가 고정된 핸들 함수가 생성되는데 생성된 핸들함수는 메모이제이션이 적용되지 않은 새로운 함수이기 때문에 prop으로 전달된 컴포넌트의 리렌더링을 유발하게 됨.
