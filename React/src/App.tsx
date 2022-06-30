@@ -1,6 +1,6 @@
 import { FC, memo, MouseEvent, PropsWithChildren, SyntheticEvent, useCallback, useEffect, useMemo, useState } from 'react'
 import './App.css'
-import { useCurring, useCurringFinal1, useCurringFinal2, useCurringFinal3 } from './useCurring'
+import { useCurring, useCurringFinal1, useCurringFinal2, useCurringFinal3, useCurringFinal4 } from './useCurring'
 
 const Button: FC<PropsWithChildren<{ onClick: any; }>> = memo((props) => {
   const { onClick, children } = props;
@@ -36,11 +36,11 @@ function App() {
   const handlerLast2 = useCurringFinal2((val1: number, val2: boolean, val3: string) => (ev: any) => {
     console.log('useCurringFinal2', val1, val2, val3, ev, count);
   }, []);
-  const handlerLast3_1 = useCurringFinal3((val1: number, val2: boolean, val3: string) => (ev: any) => {
-    console.log('useCurringFinal3-1', val1, val2, val3, ev, count);
+  const handlerLast3_1 = useCurringFinal4((val1: number, val2: boolean, val3: string) => (ev: any) => {
+    console.log('useCurringFinal3-1', val1, val2, val3, ev.type, count);
   }, []);
-  const handlerLast3_2 = useCurringFinal3((val1: number, val2: boolean, ev: SyntheticEvent) => {
-    console.log('useCurringFinal3-2', val1, val2, ev, count);
+  const handlerLast3_2 = useCurringFinal4((val1: number, val2: boolean, ev: SyntheticEvent) => {
+    console.log('useCurringFinal3-2', val1, val2, ev.type, count);
   }, [count]);
 
   const array = useMemo(() => Array(10 + (Math.floor(count / 3) % 3)).fill(0), [Math.floor(count / 3)]);

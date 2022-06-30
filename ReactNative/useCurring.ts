@@ -120,3 +120,78 @@ export function useCurringFinal3<
     return callbacks[index++];
   };
 }
+
+// let count = 0;
+
+// export function useCurringFinal3<
+//   F extends (...args: any[]) => any,
+//   E extends SyntheticEvent,
+// >(f: F, deps: any[]) {
+//   type Parameters = UseCurringFunctionArgs<F>;
+
+//   const ref = useRef({
+//     function: f,
+//     callbacks: [] as ((ev: E) => void)[],
+//     parameters: [] as Parameters[],
+//   });
+//   const {callbacks, parameters} = ref.current;
+//   let index = 0;
+
+//   useEffect(() => {
+//     ref.current.function = f;
+//   }, deps);
+
+//   useEffect(() => {
+//     index = 0;
+//   }, [count++]);
+
+//   return useCallback((...val: Parameters) => {
+//     console.log(index);
+//     if (!callbacks[index]) {
+//       const i = index;
+//       callbacks[i] = (ev: E) => {
+//         const result = ref.current.function(...parameters[i], ev);
+//         return typeof result === 'function' ? result(ev) : result;
+//       };
+//     }
+
+//     parameters[index] = val as Parameters;
+//     return callbacks[index++];
+//   }, []);
+// }
+
+export function useCurringFinal4<
+  F extends (...args: any[]) => any,
+  E extends SyntheticEvent,
+>(f: F, deps: any[]) {
+  type Parameters = UseCurringFunctionArgs<F>;
+
+  const ref = useRef({
+    function: f,
+    callbacks: [] as ((ev: E) => void)[],
+    parameters: [] as Parameters[],
+    index: 0,
+  });
+  const {callbacks, parameters, index} = ref.current;
+
+  useEffect(() => {
+    ref.current.function = f;
+  }, deps);
+
+  if (index) {
+    ref.current.index = 0;
+  }
+
+  return useCallback((...val: Parameters) => {
+    const {index} = ref.current;
+    if (!callbacks[index]) {
+      callbacks[index] = (ev: E) => {
+        const result = ref.current.function(...parameters[index], ev);
+        return typeof result === 'function' ? result(ev) : result;
+      };
+    }
+
+    parameters[index] = val as Parameters;
+    return callbacks[ref.current.index++];
+  }, []);
+}
