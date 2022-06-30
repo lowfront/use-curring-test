@@ -2,12 +2,10 @@ import { FC, memo, MouseEvent, PropsWithChildren, SyntheticEvent, useCallback, u
 import './App.css'
 import { useCurring, useCurringFinal1, useCurringFinal2, useCurringFinal3, useCurringFinal4 } from './useCurring'
 
-const Button: FC<PropsWithChildren<{ onClick: any; }>> = memo((props) => {
-  const { onClick, children } = props;
-  useEffect(() => {
-    // console.log('rerender button');
-  }, [props]);
-  return <button onClick={onClick}>{children}</button>
+const Button: FC<PropsWithChildren<{ onClick: any; label?: string; }>> = memo((props) => {
+  const { onClick, children, label } = props;
+
+  return <button onClick={onClick}>{label || children}</button>
 });
 
 const Buttons: FC<{ list: number[]; mkHandle: any }> = memo(({ list, mkHandle }) => {
@@ -22,7 +20,7 @@ function App() {
   const [bool, setBool] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(setCount, 3000, count + 1);
+    const timer = setTimeout(setCount, 1000, count + 1);
 
     return () => clearTimeout(timer);
   }, [count]);
@@ -70,7 +68,7 @@ function App() {
       <button onClick={() => setBool(bool => !bool)}>Toggle</button>
       <p style={{padding: 10}}>
       {array.map((_, i) => {
-        return <Button onClick={handlerLast3_1(i, false, 'test')} key={`test-item-${i}`}>Click {i}</Button>
+        return <Button onClick={handlerLast3_1(i, false, 'test')} key={`test-item-${i}`} label={`Click ${i}`}/>
       })}
       </p>
       <Buttons list={array} mkHandle={handlerLast3_1} />

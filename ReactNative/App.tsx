@@ -45,23 +45,62 @@ const TitleText: FC<PropsWithChildren<{}>> = ({children}) => (
 const Component: FC<{onPress?: any}> = ({onPress}) => {
   return <Text onPress={onPress}>Component rendered: {Date.now()}</Text>;
 };
-const ComponentWithMemo: FC<{prop?: number}> = memo(() => {
-  return <Text>Component rendered: {Date.now()}</Text>;
+const ComponentWithMemo: FC<{prop?: number; onPress?: any}> = memo(props => {
+  const {onPress} = props;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const text = useMemo(() => `Component rendered: ${Date.now()}`, [onPress]);
+  return <Text onPress={onPress}>{text}</Text>;
 });
 
 const Buttons: FC<{list: number[]; mkHandle: any}> = memo(
   ({list, mkHandle}) => {
+    const [count, setCount] = useState(0);
+
+    useEffect(() => {
+      const timer = setTimeout(setCount, 1000, count + 1);
+
+      return () => clearTimeout(timer);
+    }, [count]);
+
     return (
-      <View>
-        {list.map((_, i) => {
+      <>
+        {[1, 2, 3, 4].map((_, i) => {
           return (
-            <Component onPress={mkHandle(i, false)} key={`test-item-${i}`} />
+            <ComponentWithMemo
+              onPress={mkHandle(i, false)}
+              key={`test-item-${i}`}
+            />
           );
         })}
-      </View>
+      </>
     );
   },
 );
+
+const Buttons2: FC<{list: number[]; handle: any}> = memo(({list, handle}) => {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    const timer = setTimeout(setCount, 1000, count + 1);
+
+    return () => clearTimeout(timer);
+  }, [count]);
+
+  const mkHandle = useCurringFinal4(handle, []);
+
+  return (
+    <>
+      {[1, 2, 3, 4].map((_, i) => {
+        return (
+          <ComponentWithMemo
+            onPress={mkHandle(i, false)}
+            key={`test-item-${i}`}
+          />
+        );
+      })}
+    </>
+  );
+});
 
 const ComponentWithChildren: FC<PropsWithChildren<{}>> = ({children}) => {
   return (
@@ -227,7 +266,7 @@ const UseCurring = () => {
   }, [count]);
 
   const handle1 = useCurring(
-    (val: string) => (ev: any) => {
+    (val: number, bool: boolean) => (ev: any) => {
       console.log('handle1', val, ev.timeStamp);
     },
     [],
@@ -248,14 +287,14 @@ const UseCurring = () => {
     [],
   );
   const handle5 = useCurringFinal4(
-    (val: string, bool: boolean) => (ev: any) => {
+    (val: number, bool: boolean) => (ev: any) => {
       console.log('useCurringFinal4', val, bool, ev.timeStamp);
     },
     [],
   );
 
   const array = useMemo(
-    () => Array(5 + (Math.floor(count / 3) % 3)).fill(0),
+    () => Array(5 + (Math.floor(count / 5) % 5)).fill(0),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [Math.floor(count / 3)],
   );
@@ -263,7 +302,7 @@ const UseCurring = () => {
   return (
     <SafeAreaView>
       <View>
-        <PressComponent onPress={handle1('[useCurring]')}>
+        {/* <PressComponent onPress={handle1('[useCurring]')}>
           useCurring
         </PressComponent>
         <PressComponent onPress={handle2('[new useCurring1]', true)}>
@@ -278,7 +317,41 @@ const UseCurring = () => {
         <PressComponent onPress={handle5('[new useCurring4]', true)}>
           new useCurring 4
         </PressComponent>
+      */}
+        {/* <Buttons list={array} mkHandle={handle1} />  */}
+        <Text>Previous useCurring</Text>
+        <>
+          {array.map((_, i) => {
+            return (
+              <ComponentWithMemo
+                onPress={handle1(i, true)}
+                key={`test-item-${i}`}
+              />
+            );
+          })}
+        </>
+        <Text>New useCurring</Text>
+        <>
+          {array.map((_, i) => {
+            return (
+              <ComponentWithMemo
+                onPress={handle5(i, false)}
+                key={`test-item-${i}`}
+              />
+            );
+          })}
+        </>
+        <Text>New useCurring : 문제점</Text>
+
         <Buttons list={array} mkHandle={handle5} />
+        <Text>New useCurring : 사용 사례</Text>
+        <Buttons2
+          list={array}
+          handle={useCallback(
+            (...props: any[]) => console.log(props.slice(0, 2)),
+            [],
+          )}
+        />
       </View>
     </SafeAreaView>
   );
