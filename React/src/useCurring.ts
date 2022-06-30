@@ -26,24 +26,26 @@ type UseCurringCallbackParameters<T extends any[]> =
   LastItem<T> extends SyntheticEvent ? ExceptLastItem<T> : T;
 
 export function useCurringFinal1<T extends any[], E extends SyntheticEvent>(
-    f: (...args: T) => void,
-    deps: any[],
-  ) {
+  f: (...args: T) => void,
+  deps: any[],
+) {
   const ref = useRef({
+    function: f,
     callbacks: [] as ((ev: E) => void)[],
     parameters: [] as T[],
   });
-  const { callbacks, parameters } = ref.current;
+  const {callbacks, parameters} = ref.current;
   let index = 0;
 
   useEffect(() => {
-    ref.current.callbacks = callbacks.map((_, index) => (ev: E) => (f as any)(...parameters[index], ev));
+    ref.current.function = f;
   }, deps);
-  
+
   return (...val: UseCurringCallbackParameters<T>) => {
     if (!callbacks[index]) {
       const i = index;
-      callbacks[i] = (ev: E) => (f as any)(...parameters[i], ev);
+      callbacks[i] = (ev: E) =>
+        (ref.current.function as any)(...parameters[i], ev);
     }
     parameters[index] = val as T;
     return callbacks[index++];
@@ -51,24 +53,26 @@ export function useCurringFinal1<T extends any[], E extends SyntheticEvent>(
 }
 
 export function useCurringFinal2<T extends any[], E extends SyntheticEvent>(
-    f: (...args: T) => (ev: E) => void,
-    deps: any[],
-  ) {
+  f: (...args: T) => (ev: E) => void,
+  deps: any[],
+) {
   const ref = useRef({
+    function: f,
     callbacks: [] as ((ev: E) => void)[],
     parameters: [] as T[],
   });
-  const { callbacks, parameters } = ref.current;
+  const {callbacks, parameters} = ref.current;
   let index = 0;
 
   useEffect(() => {
-    ref.current.callbacks = callbacks.map((_, index) => (ev: E) => (f as any)(...parameters[index])(ev));
+    ref.current.function = f;
   }, deps);
-  
+
   return (...val: T) => {
     if (!callbacks[index]) {
       const i = index;
-      callbacks[i] = (ev: E) => (f as any)(...parameters[i])(ev);
+      callbacks[i] = (ev: E) =>
+        (ref.current.function as any)(...parameters[i])(ev);
     }
 
     parameters[index] = val as T;

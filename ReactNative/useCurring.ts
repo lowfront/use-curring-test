@@ -32,6 +32,7 @@ export function useCurringFinal1<T extends any[], E extends SyntheticEvent>(
   deps: any[],
 ) {
   const ref = useRef({
+    function: f,
     callbacks: [] as ((ev: E) => void)[],
     parameters: [] as T[],
   });
@@ -39,15 +40,14 @@ export function useCurringFinal1<T extends any[], E extends SyntheticEvent>(
   let index = 0;
 
   useEffect(() => {
-    ref.current.callbacks = callbacks.map(
-      (_, index) => (ev: E) => (f as any)(...parameters[index], ev),
-    );
+    ref.current.function = f;
   }, deps);
 
   return (...val: UseCurringCallbackParameters<T>) => {
     if (!callbacks[index]) {
       const i = index;
-      callbacks[i] = (ev: E) => (f as any)(...parameters[i], ev);
+      callbacks[i] = (ev: E) =>
+        (ref.current.function as any)(...parameters[i], ev);
     }
     parameters[index] = val as T;
     return callbacks[index++];
@@ -59,6 +59,7 @@ export function useCurringFinal2<T extends any[], E extends SyntheticEvent>(
   deps: any[],
 ) {
   const ref = useRef({
+    function: f,
     callbacks: [] as ((ev: E) => void)[],
     parameters: [] as T[],
   });
@@ -66,15 +67,14 @@ export function useCurringFinal2<T extends any[], E extends SyntheticEvent>(
   let index = 0;
 
   useEffect(() => {
-    ref.current.callbacks = callbacks.map(
-      (_, index) => (ev: E) => (f as any)(...parameters[index])(ev),
-    );
+    ref.current.function = f;
   }, deps);
 
   return (...val: T) => {
     if (!callbacks[index]) {
       const i = index;
-      callbacks[i] = (ev: E) => (f as any)(...parameters[i])(ev);
+      callbacks[i] = (ev: E) =>
+        (ref.current.function as any)(...parameters[i])(ev);
     }
 
     parameters[index] = val as T;
