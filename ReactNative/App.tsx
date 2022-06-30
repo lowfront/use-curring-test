@@ -33,6 +33,7 @@ import {
   useCurringFinal1,
   useCurringFinal2,
   useCurringFinal3,
+  useCurringFinal4,
 } from './useCurring';
 
 import {NavigationContainer, useNavigation} from '@react-navigation/native';
@@ -41,12 +42,27 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 const TitleText: FC<PropsWithChildren<{}>> = ({children}) => (
   <Text style={{fontWeight: '700'}}>{children}</Text>
 );
-const Component = () => {
-  return <Text>Component rendered: {Date.now()}</Text>;
+const Component: FC<{onPress?: any}> = ({onPress}) => {
+  return <Text onPress={onPress}>Component rendered: {Date.now()}</Text>;
 };
 const ComponentWithMemo: FC<{prop?: number}> = memo(() => {
   return <Text>Component rendered: {Date.now()}</Text>;
 });
+
+const Buttons: FC<{list: number[]; mkHandle: any}> = memo(
+  ({list, mkHandle}) => {
+    return (
+      <View>
+        {list.map((_, i) => {
+          return (
+            <Component onPress={mkHandle(i, false)} key={`test-item-${i}`} />
+          );
+        })}
+      </View>
+    );
+  },
+);
+
 const ComponentWithChildren: FC<PropsWithChildren<{}>> = ({children}) => {
   return (
     <View>
@@ -227,9 +243,21 @@ const UseCurring = () => {
   );
   const handle4 = useCurringFinal3(
     (val: string, bool: boolean) => (ev: any) => {
-      console.log('useCurringFinal2', val, bool, ev.timeStamp);
+      console.log('useCurringFinal3', val, bool, ev.timeStamp);
     },
     [],
+  );
+  const handle5 = useCurringFinal4(
+    (val: string, bool: boolean) => (ev: any) => {
+      console.log('useCurringFinal4', val, bool, ev.timeStamp);
+    },
+    [],
+  );
+
+  const array = useMemo(
+    () => Array(5 + (Math.floor(count / 3) % 3)).fill(0),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [Math.floor(count / 3)],
   );
 
   return (
@@ -244,9 +272,13 @@ const UseCurring = () => {
         <PressComponent onPress={handle3('[new useCurring2]', false)}>
           new useCurring 2
         </PressComponent>
-        <PressComponent onPress={handle4('[new useCurring4]', false)}>
+        <PressComponent onPress={handle4('[new useCurring3]', false)}>
           new useCurring 3
         </PressComponent>
+        <PressComponent onPress={handle5('[new useCurring4]', true)}>
+          new useCurring 4
+        </PressComponent>
+        <Buttons list={array} mkHandle={handle5} />
       </View>
     </SafeAreaView>
   );
