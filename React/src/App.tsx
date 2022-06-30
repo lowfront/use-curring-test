@@ -43,7 +43,6 @@ function App() {
     console.log('useCurringFinal3-2', val1, val2, ev, count);
   }, [count]);
 
-  console.log(Math.floor(count / 3));
   const array = useMemo(() => Array(10 + (Math.floor(count / 3) % 3)).fill(0), [Math.floor(count / 3)]);
 
   return (
