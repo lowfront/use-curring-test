@@ -1,9 +1,19 @@
-import { FC, memo, MouseEvent, PropsWithChildren, SyntheticEvent, useCallback, useEffect, useState } from 'react'
+import { FC, memo, MouseEvent, PropsWithChildren, SyntheticEvent, useCallback, useEffect, useMemo, useState } from 'react'
 import './App.css'
 import { useCurring, useCurringFinal1, useCurringFinal2, useCurringFinal3 } from './useCurring'
 
-const Button: FC<PropsWithChildren<{ onClick: any; }>> = memo(({ onClick, children }) => {
+const Button: FC<PropsWithChildren<{ onClick: any; }>> = memo((props) => {
+  const { onClick, children } = props;
+  useEffect(() => {
+    console.log('rerender button');
+  }, [props]);
   return <button onClick={onClick}>{children}</button>
+});
+
+const Buttons: FC<{ list: number[]; mkHandle: any }> = memo(({ list, mkHandle }) => {
+  return <p>{list.map((_, i) => {
+    return <Button onClick={mkHandle(i, false)} key={`test-item-${i}`}>Click {i}</Button>
+  })}</p>;
 });
 
 type a = SyntheticEvent
@@ -33,6 +43,9 @@ function App() {
     console.log('useCurringFinal3-2', val1, val2, ev, count);
   }, [count]);
 
+  console.log(Math.floor(count / 3));
+  const array = useMemo(() => Array(10 + (Math.floor(count / 3) % 3)).fill(0), [Math.floor(count / 3)]);
+
   return (
     <div className="App">
       {count}
@@ -56,6 +69,12 @@ function App() {
         <Button onClick={handlerLast3_2(101, true)}>Click new curring 3-2 handler</Button>
       </p>
       <button onClick={() => setBool(bool => !bool)}>Toggle</button>
+      <p style={{padding: 10}}>
+      {array.map((_, i) => {
+        return <Button onClick={handlerLast3_1(i, false, 'test')} key={`test-item-${i}`}>Click {i}</Button>
+      })}
+      </p>
+      <Buttons list={array} mkHandle={handlerLast3_1} />
     </div>
   )
 }

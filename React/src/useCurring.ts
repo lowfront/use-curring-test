@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable react-hooks/exhaustive-deps */
 import {SyntheticEvent, useCallback, useEffect, useRef} from 'react';
 
 export function useCurring<R, T extends unknown[]>(
@@ -41,7 +43,7 @@ export function useCurringFinal1<T extends any[], E extends SyntheticEvent>(
     ref.current.function = f;
   }, deps);
 
-  return (...val: UseCurringCallbackParameters<T>) => {
+  return useCallback((...val: UseCurringCallbackParameters<T>) => {
     if (!callbacks[index]) {
       const i = index;
       callbacks[i] = (ev: E) =>
@@ -49,7 +51,7 @@ export function useCurringFinal1<T extends any[], E extends SyntheticEvent>(
     }
     parameters[index] = val as T;
     return callbacks[index++];
-  };
+  }, []);
 }
 
 export function useCurringFinal2<T extends any[], E extends SyntheticEvent>(
@@ -68,7 +70,7 @@ export function useCurringFinal2<T extends any[], E extends SyntheticEvent>(
     ref.current.function = f;
   }, deps);
 
-  return (...val: T) => {
+  return useCallback((...val: T) => {
     if (!callbacks[index]) {
       const i = index;
       callbacks[i] = (ev: E) => ref.current.function(...parameters[i])(ev);
@@ -76,7 +78,7 @@ export function useCurringFinal2<T extends any[], E extends SyntheticEvent>(
 
     parameters[index] = val as T;
     return callbacks[index++];
-  };
+  }, []);
 }
 
 type UseCurringFunctionArgs<T> = T extends (
@@ -105,7 +107,7 @@ export function useCurringFinal3<
     ref.current.function = f;
   }, deps);
 
-  return (...val: Parameters) => {
+  return useCallback((...val: Parameters) => {
     if (!callbacks[index]) {
       const i = index;
       callbacks[i] = (ev: E) => {
@@ -116,5 +118,5 @@ export function useCurringFinal3<
 
     parameters[index] = val as Parameters;
     return callbacks[index++];
-  };
+  }, []);
 }
