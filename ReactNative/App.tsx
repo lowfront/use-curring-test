@@ -28,7 +28,12 @@ import {
   View,
 } from 'react-native';
 
-import {useCurring, useCurringFinal1, useCurringFinal2} from './useCurring';
+import {
+  useCurring,
+  useCurringFinal1,
+  useCurringFinal2,
+  useCurringFinal3,
+} from './useCurring';
 
 import {NavigationContainer, useNavigation} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -220,6 +225,12 @@ const UseCurring = () => {
     },
     [],
   );
+  const handle4 = useCurringFinal3(
+    (val: string, bool: boolean) => (ev: any) => {
+      console.log('useCurringFinal2', val, bool, ev.timeStamp);
+    },
+    [],
+  );
 
   return (
     <SafeAreaView>
@@ -228,10 +239,13 @@ const UseCurring = () => {
           useCurring
         </PressComponent>
         <PressComponent onPress={handle2('[new useCurring1]', true)}>
-          new useCurring
+          new useCurring 1
         </PressComponent>
         <PressComponent onPress={handle3('[new useCurring2]', false)}>
-          new useCurring
+          new useCurring 2
+        </PressComponent>
+        <PressComponent onPress={handle4('[new useCurring4]', false)}>
+          new useCurring 3
         </PressComponent>
       </View>
     </SafeAreaView>

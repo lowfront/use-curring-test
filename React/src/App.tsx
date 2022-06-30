@@ -5,7 +5,7 @@ import { useCurring, useCurringFinal1, useCurringFinal2, useCurringFinal3 } from
 const Button: FC<PropsWithChildren<{ onClick: any; }>> = memo((props) => {
   const { onClick, children } = props;
   useEffect(() => {
-    console.log('rerender button');
+    // console.log('rerender button');
   }, [props]);
   return <button onClick={onClick}>{children}</button>
 });
