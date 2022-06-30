@@ -71,8 +71,7 @@ export function useCurringFinal2<T extends any[], E extends SyntheticEvent>(
   return (...val: T) => {
     if (!callbacks[index]) {
       const i = index;
-      callbacks[i] = (ev: E) =>
-        (ref.current.function as any)(...parameters[i])(ev);
+      callbacks[i] = (ev: E) => ref.current.function(...parameters[i])(ev);
     }
 
     parameters[index] = val as T;
@@ -110,7 +109,7 @@ export function useCurringFinal3<
     if (!callbacks[index]) {
       const i = index;
       callbacks[i] = (ev: E) => {
-        const result = (ref.current.function as any)(...parameters[i], ev);
+        const result = ref.current.function(...parameters[i], ev);
         return typeof result === 'function' ? result(ev) : result;
       };
     }
