@@ -81,3 +81,43 @@ export function useCurringFinal2<T extends any[], E extends SyntheticEvent>(
     return callbacks[index++];
   };
 }
+
+type UseCurringFunctionArgs<T> = T extends (
+  ...args: infer P
+) => (ev: any) => void
+  ? P
+  : T extends (...args: infer P) => void
+  ? UseCurringCallbackParameters<P>
+  : never;
+
+export function useCurringFinal3<
+  F extends (...args: any[]) => any,
+  E extends SyntheticEvent,
+>(f: F, deps: any[]) {
+  type Parameters = UseCurringFunctionArgs<F>;
+
+  const ref = useRef({
+    function: f,
+    callbacks: [] as ((ev: E) => void)[],
+    parameters: [] as Parameters[],
+  });
+  const {callbacks, parameters} = ref.current;
+  let index = 0;
+
+  useEffect(() => {
+    ref.current.function = f;
+  }, deps);
+
+  return (...val: Parameters) => {
+    if (!callbacks[index]) {
+      const i = index;
+      callbacks[i] = (ev: E) => {
+        const result = (ref.current.function as any)(...parameters[i], ev);
+        return typeof result === 'function' ? result(ev) : result;
+      };
+    }
+
+    parameters[index] = val as Parameters;
+    return callbacks[index++];
+  };
+}
