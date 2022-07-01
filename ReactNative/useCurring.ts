@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react-hooks/exhaustive-deps */
 import {SyntheticEvent, useCallback, useEffect, useRef} from 'react';
@@ -194,4 +195,50 @@ export function useCurringFinal4<
     parameters[index] = val as Parameters;
     return callbacks[ref.current.index++];
   }, []);
+}
+
+export function useCurringFinal5<
+  F extends (...args: any[]) => any,
+  E extends SyntheticEvent,
+>(f: F, deps: any[]) {
+  type Parameters = UseCurringFunctionArgs<F>;
+
+  const ref = useRef({
+    function: f,
+    callbacks: [] as ((ev: E) => void)[],
+    parameters: [] as Parameters[],
+    index: 0,
+  });
+  const {callbacks, parameters, index} = ref.current;
+
+  useEffect(() => {
+    ref.current.function = f;
+  }, deps);
+
+  if (index) {
+    ref.current.index = 0;
+  }
+
+  return useCallback(
+    Object.assign(
+      (...val: Parameters) => {
+        const {index} = ref.current;
+        if (!callbacks[index]) {
+          callbacks[index] = (ev: E) => {
+            const result = ref.current.function(...parameters[index], ev);
+            return typeof result === 'function' ? result(ev) : result;
+          };
+        }
+
+        parameters[index] = val as Parameters;
+        return callbacks[ref.current.index++];
+      },
+      {
+        get clone() {
+          return useCallback(() => useCurringFinal5(f, deps), deps);
+        },
+      },
+    ),
+    [],
+  );
 }

@@ -34,6 +34,7 @@ import {
   useCurringFinal2,
   useCurringFinal3,
   useCurringFinal4,
+  useCurringFinal5,
 } from './useCurring';
 
 import {NavigationContainer, useNavigation} from '@react-navigation/native';
@@ -52,10 +53,10 @@ const ComponentWithMemo: FC<{prop?: number; onPress?: any}> = memo(props => {
   return <Text onPress={onPress}>{text}</Text>;
 });
 
-const Buttons: FC<{list: number[]; mkHandle: any}> = memo(
-  ({list, mkHandle}) => {
+const Buttons: FC<{list: number[]; useHandle: any}> = memo(
+  ({list, useHandle}) => {
     const [count, setCount] = useState(0);
-
+    const handle = useHandle();
     useEffect(() => {
       const timer = setTimeout(setCount, 1000, count + 1);
 
@@ -67,7 +68,7 @@ const Buttons: FC<{list: number[]; mkHandle: any}> = memo(
         {[1, 2, 3, 4].map((_, i) => {
           return (
             <ComponentWithMemo
-              onPress={mkHandle(i, false)}
+              onPress={handle(i, false)}
               key={`test-item-${i}`}
             />
           );
@@ -286,7 +287,7 @@ const UseCurring = () => {
     },
     [],
   );
-  const handle5 = useCurringFinal4(
+  const handle5 = useCurringFinal5(
     (val: number, bool: boolean) => (ev: any) => {
       console.log('useCurringFinal4', val, bool, ev.timeStamp);
     },
@@ -343,7 +344,7 @@ const UseCurring = () => {
         </>
         <Text>New useCurring : 문제점</Text>
 
-        <Buttons list={array} mkHandle={handle5} />
+        <Buttons list={array} useHandle={handle5.clone} />
         <Text>New useCurring : 사용 사례</Text>
         <Buttons2
           list={array}
