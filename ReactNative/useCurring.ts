@@ -234,9 +234,7 @@ export function useCurringFinal5<
         return callbacks[ref.current.index++];
       },
       {
-        get clone() {
-          return useCallback(() => useCurringFinal5(f, deps), deps);
-        },
+        clone: useCallback(() => useCurringFinal5(f, deps), deps),
       },
     ),
     [],
